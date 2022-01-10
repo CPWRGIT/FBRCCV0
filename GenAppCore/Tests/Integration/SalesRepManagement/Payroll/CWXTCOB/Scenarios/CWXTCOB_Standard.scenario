@@ -15,7 +15,7 @@ Store expected RPFILE data locally and restore to mainframe</Description>
     <Scope name="Config" disabled="false">
       <Variable id="userid">FBRCCV0</Variable>
       <Variable id="ispw_app">GITI</Variable>
-      <Variable id="ispw_level">${ispw_level_value}</Variable>
+      <Variable id="ispw_level">${ispw_level}</Variable>
     </Scope>
     <Scope name="Initialize" disabled="false">
       <Scope name="Variable Set Up" disabled="false">
