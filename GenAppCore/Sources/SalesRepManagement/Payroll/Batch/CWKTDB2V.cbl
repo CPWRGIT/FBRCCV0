@@ -2,7 +2,7 @@
        PROGRAM-ID.       CWKTDB2X.
       ******************************************************************
       *                                                                *
-      ****** +    C O M P U W A R E   C O R P O R A T I O N       ******
+      ******      C O M P U W A R E   C O R P O R A T I O N       ******
       *                                                                *
       *  THIS PROGRAM IS A DB2 COBOL DEMO PROGRAM USED FOR             *
       *  TOPAZ FOR TOTAL TEST TRAINING SESSIONS.                       *
@@ -36,18 +36,18 @@
            EXEC SQL INCLUDE SQLCA END-EXEC.
       *    EXEC SQL INCLUDE KTDMOTB1 END-EXEC.
       ******************************************************************
-      * DCLGEN TABLE(FTS_DEMOTAB)                                      *
+      * DCLGEN TABLE(KT_DEMOTAB)                                       *
       *        LIBRARY()                                               *
       *        ACTION(REPLACE)                                         *
       *        LANGUAGE(COBOL)                                         *
-      *        STRUCTURE(FTSDCL-DEMOTAB)                               *
+      *        STRUCTURE(KTDCL-DEMOTAB)                                *
       *        APOST                                                   *
       *        LABEL(YES)                                              *
       *        DBCSDELIM(NO)                                           *
       *        INDVAR(YES)                                             *
       * ... IS THE DCLGEN COMMAND THAT MADE THE FOLLOWING STATEMENTS   *
       ******************************************************************
-           EXEC SQL DECLARE FTS_DEMOTAB  TABLE
+           EXEC SQL DECLARE KT_DEMOTAB  TABLE
            ( EMP_NUM                        CHAR(5) NOT NULL,
              WAGE_TYPE                      CHAR(1),
              REGION                         SMALLINT,
@@ -64,9 +64,9 @@
              COMM                           DECIMAL(6, 2)
            ) END-EXEC.
       ******************************************************************
-      * COBOL DECLARATION FOR TABLE TOPTOT.FTS_DEMOTAB                 *
+      * COBOL DECLARATION FOR TABLE TOPTOT.KT_DEMOTAB                  *
       ******************************************************************
-       01  FTSDCL-DEMOTAB.
+       01  KTDCL-DEMOTAB.
       *    *************************************************************
            10 EMP-NUM              PIC X(5).
       *    *************************************************************
@@ -114,7 +114,7 @@
       ******************************************************************
            EXEC SQL DECLARE EMPLOYEE_CURSOR CURSOR FOR
                 SELECT *
-                FROM FTS_DEMOTAB
+                FROM KT_DEMOTAB
                 WHERE EMP_NUM = :EMP-NUM
                 FOR UPDATE OF WAGES, OVERTIME, COMM
            END-EXEC.
@@ -531,7 +531,6 @@
            IF WA-EMP-HOURS GREATER THAN 40
                COMPUTE EMP-WAGES = WA-EMP-RATE * 40
                COMPUTE OT-HOURS  = WA-EMP-HOURS - 40
-*********      VICARI      
                COMPUTE OT-AMOUNT = OT-HOURS * (WA-EMP-RATE * 1.5)
            ELSE
                COMPUTE EMP-WAGES = WA-EMP-HOURS * WA-EMP-RATE.
@@ -593,14 +592,14 @@
                IF CURSOR-FETCHED THEN
                  DISPLAY 'DELETE WS-CURSOR-SWITCH= ',
                  WS-CURSOR-SWITCH
-                 EXEC SQL DELETE FTS_DEMOTAB
+                 EXEC SQL DELETE KT_DEMOTAB
                            WHERE CURRENT OF EMPLOYEE_CURSOR
                  END-EXEC
                ELSE
                  DISPLAY 'DELETE WS-CURSOR-SWITCH= ',
                  WS-CURSOR-SWITCH
                  IF DELETED AND CURSOR-NOT-FETCHED
-                     EXEC SQL DELETE FTS_DEMOTAB
+                     EXEC SQL DELETE KT_DEMOTAB
                            WHERE EMP_NUM = :EMP-NUM
                      END-EXEC
                  END-IF
@@ -634,14 +633,14 @@
                   DISPLAY 'WS-CURSOR-SWITCH= ',WS-CURSOR-SWITCH
                   IF CURSOR-FETCHED
                     DISPLAY 'HOURLY UPDATE-SWITCH 1= ',WS-CURSOR-SWITCH
-                       EXEC SQL UPDATE FTS_DEMOTAB
+                       EXEC SQL UPDATE KT_DEMOTAB
                              SET (WAGES, OVERTIME, COMM)
                              = (:WAGES, :OVERTIME, :COMM)
                              WHERE CURRENT OF EMPLOYEE_CURSOR
                        END-EXEC
                   ELSE
                     DISPLAY 'HOURLY UPDATE-SWITCH 2= ',WS-CURSOR-SWITCH
-                       EXEC SQL UPDATE FTS_DEMOTAB
+                       EXEC SQL UPDATE KT_DEMOTAB
                              SET (WAGES, OVERTIME, COMM)
                              = (:WAGES, :OVERTIME, :COMM)
                              WHERE EMP_NUM = :EMP-NUM
@@ -660,7 +659,7 @@
                   DISPLAY 'WS-CURSOR-SWITCH= ',WS-CURSOR-SWITCH
                   IF CURSOR-OPEN OR CURSOR-FETCHED
                     DISPLAY 'SALES UPDATE SWITCH= ',WS-CURSOR-SWITCH
-                       EXEC SQL UPDATE FTS_DEMOTAB
+                       EXEC SQL UPDATE KT_DEMOTAB
                              SET (WAGES, OVERTIME, COMM)
                              = (:WAGES, :OVERTIME, :COMM)
                              WHERE CURRENT OF EMPLOYEE_CURSOR
@@ -668,7 +667,7 @@
                   ELSE
                     DISPLAY 'SECOND IN ELSE SALES '
                     DISPLAY 'SALES UPDATE SWITCH= ',WS-CURSOR-SWITCH
-                       EXEC SQL UPDATE FTS_DEMOTAB
+                       EXEC SQL UPDATE KT_DEMOTAB
                              SET (WAGES, OVERTIME, COMM)
                              = (:WAGES, :OVERTIME, :COMM)
                              WHERE EMP_NUM = :EMP-NUM
@@ -851,7 +850,7 @@
            END-IF.
            IF EOF-SW NOT EQUAL TO 'Y' THEN
               EXEC SQL FETCH EMPLOYEE_CURSOR INTO
-                   :FTSDCL-DEMOTAB:IKT-DEMOTAB.INDSTRUC
+                   :KTDCL-DEMOTAB:IKT-DEMOTAB.INDSTRUC
               END-EXEC
               MOVE SQLCODE TO WS-DISPLAY-SQLCODE
               DISPLAY 'SQLCODE ON FETCH - SQLCODE = ',
@@ -891,7 +890,7 @@
                     DISPLAY 'HIREDATE= ', HIREDATE
                     MOVE WA-EMP-REGION TO REGION
                     EXEC SQL
-                       INSERT INTO FTS_DEMOTAB
+                       INSERT INTO KT_DEMOTAB
                        (
                        EMP_NUM               ,
                        WAGE_TYPE             ,
@@ -946,7 +945,7 @@
            MOVE '000000' TO EMP-NUM.
            EXEC SQL SELECT COUNT(*)
                     INTO :NUMBER-OF-EMPLOYEES
-                   FROM FTS_DEMOTAB
+                   FROM KT_DEMOTAB
                    WHERE EMP_NUM > :EMP-NUM
            END-EXEC.
            IF SQLCODE NOT EQUAL TO 0
@@ -954,7 +953,7 @@
               DISPLAY 'ERROR ON SELECT COUNT - SQLCODE = ',
               WS-DISPLAY-SQLCODE
            END-IF.
-           DISPLAY 'NUMBER OF EMPLOYEES IN FTS_DEMOTAB= ',
+           DISPLAY 'NUMBER OF EMPLOYEES IN KT_DEMOTAB= ',
               NUMBER-OF-EMPLOYEES.
            MOVE NUMBER-OF-EMPLOYEES TO EMPLOYEE-COUNT.
            IF PARM-LTH = 5
@@ -1002,7 +1001,10 @@
 *********
        9800-BAD-PARM.
            DISPLAY 'IN 9800-BAD-PARM'.
-           MOVE 'Y' TO PARM-ERROR-SW.       
+           MOVE 'Y' TO PARM-ERROR-SW.
+           MOVE '   PARAMETER LENGTH OR DATA IS INCORRECT   '
+               TO ERROR-LINE.
+           WRITE REPORT-RECORD FROM ERROR-LINE.
 *********
 *********
        9900-CLOSE.
